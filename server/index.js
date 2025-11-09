@@ -96,7 +96,7 @@ app.get('/logout', (req, res) => {
 app.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
         // Obtener datos reales de la base de datos
-        const stats = db.getStats();
+        const stats = await db.getStats();
 
         res.render('dashboard', {
             user: req.user,
@@ -148,7 +148,7 @@ app.get('/api/tickets', isAuthenticated, (req, res) => {
 
 // Página de vouches
 app.get('/vouches', isAuthenticated, (req, res) => {
-    const allVouches = db.getAllVouches();
+    const allVouches = await db.getAllVouches();
     
     // Formatear para la vista
     const vouches = allVouches.map(vouch => ({
@@ -168,7 +168,7 @@ app.get('/vouches', isAuthenticated, (req, res) => {
 
 // API endpoint para vouches en tiempo real
 app.get('/api/vouches', isAuthenticated, (req, res) => {
-    const allVouches = db.getAllVouches();
+    const allVouches = await db.getAllVouches();
     
     const vouches = allVouches.map(vouch => ({
         id: vouch.id,
@@ -185,8 +185,8 @@ app.get('/api/vouches', isAuthenticated, (req, res) => {
 // Página de estadísticas
 app.get('/stats', isAuthenticated, (req, res) => {
     const allTickets = db.getAllTickets();
-    const allVouches = db.getAllVouches();
-    const stats = db.getStats();
+    const allVouches = await db.getAllVouches();
+    const stats = await db.getStats();
     
     // Calcular estadísticas detalladas
     const boostTickets = allTickets.filter(t => t.type === 'Boost').length;
@@ -231,7 +231,7 @@ app.get('/bots', isAuthenticated, (req, res) => {
 
 // API endpoints para datos en tiempo real
 app.get('/api/stats', isAuthenticated, (req, res) => {
-    const stats = db.getStats();
+    const stats = await db.getStats();
     res.json(stats);
 });
 
@@ -260,7 +260,7 @@ app.post('/api/ticket/:id/close', isAuthenticated, (req, res) => {
 });
 
 // API: Datos de tendencia para gráfica
-app.get('/api/trend-data', isAuthenticated, (req, res) => {
+app.get('/api/trend-data', isAuthenticated, async (req, res) => {
     const allTickets = db.getAllTickets();
     const now = new Date();
     const labels = [];
@@ -294,9 +294,9 @@ app.get('/api/trend-data', isAuthenticated, (req, res) => {
 });
 
 // API: Activity Feed
-app.get('/api/activity-feed', isAuthenticated, (req, res) => {
+app.get('/api/activity-feed', isAuthenticated, async (req, res) => {
     const allTickets = db.getAllTickets();
-    const allVouches = db.getAllVouches();
+    const allVouches = await db.getAllVouches();
     const activities = [];
     
     // Agregar tickets recientes
@@ -334,7 +334,7 @@ app.get('/api/activity-feed', isAuthenticated, (req, res) => {
 });
 
 // API: Top Users
-app.get('/api/top-users', isAuthenticated, (req, res) => {
+app.get('/api/top-users', isAuthenticated, async (req, res) => {
     const allTickets = db.getAllTickets();
     const userCounts = {};
     
@@ -457,3 +457,10 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
+
+
+
+
+
+
