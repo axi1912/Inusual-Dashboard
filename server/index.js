@@ -195,7 +195,7 @@ app.get('/stats', isAuthenticated, async (req, res) => {
     
     // Calcular promedio de rating
     const totalRating = allVouches.reduce((sum, v) => sum + v.stars, 0);
-    const avgRating = allVouches.length > 0 ? (totalRating / allVouches.length).toFixed(1) : 0;
+    const avgRating = vouchesWithStars.length > 0 ? (totalRating / vouchesWithStars.length).toFixed(1) : 0;
     const fiveStarVouches = allVouches.filter(v => v.stars === 5).length;
 
     const statsData = {
@@ -457,6 +457,7 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
 
 
 
