@@ -110,7 +110,7 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
 
 // Página de tickets
 app.get('/tickets', isAuthenticated, (req, res) => {
-    const allTickets = db.getAllTickets();
+    const allTickets = await db.getAllTickets();
     
     // Formatear para la vista
     const tickets = allTickets.map(ticket => ({
@@ -130,7 +130,7 @@ app.get('/tickets', isAuthenticated, (req, res) => {
 
 // API endpoint para tickets en tiempo real
 app.get('/api/tickets', isAuthenticated, (req, res) => {
-    const allTickets = db.getAllTickets();
+    const allTickets = await db.getAllTickets();
     
     const tickets = allTickets.map(ticket => ({
         id: ticket.id,
@@ -183,8 +183,8 @@ app.get('/api/vouches', isAuthenticated, async (req, res) => {
 });
 
 // Página de estadísticas
-app.get('/stats', isAuthenticated, (req, res) => {
-    const allTickets = db.getAllTickets();
+app.get('/stats', isAuthenticated, async (req, res) => {
+    const allTickets = await db.getAllTickets();
     const allVouches = await db.getAllVouches();
     const stats = await db.getStats();
     
@@ -261,7 +261,7 @@ app.post('/api/ticket/:id/close', isAuthenticated, (req, res) => {
 
 // API: Datos de tendencia para gráfica
 app.get('/api/trend-data', isAuthenticated, async (req, res) => {
-    const allTickets = db.getAllTickets();
+    const allTickets = await db.getAllTickets();
     const now = new Date();
     const labels = [];
     const created = [];
@@ -295,7 +295,7 @@ app.get('/api/trend-data', isAuthenticated, async (req, res) => {
 
 // API: Activity Feed
 app.get('/api/activity-feed', isAuthenticated, async (req, res) => {
-    const allTickets = db.getAllTickets();
+    const allTickets = await db.getAllTickets();
     const allVouches = await db.getAllVouches();
     const activities = [];
     
@@ -335,7 +335,7 @@ app.get('/api/activity-feed', isAuthenticated, async (req, res) => {
 
 // API: Top Users
 app.get('/api/top-users', isAuthenticated, async (req, res) => {
-    const allTickets = db.getAllTickets();
+    const allTickets = await db.getAllTickets();
     const userCounts = {};
     
     allTickets.forEach(ticket => {
@@ -457,6 +457,7 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
 
 
 
