@@ -156,7 +156,7 @@ app.get('/vouches', isAuthenticated, async (req, res) => {
         from: vouch.fromUsername,
         to: vouch.toUsername,
         rating: vouch.stars,
-        review: vouch.comment,
+        review: vouch.comment || 'No comment provided',
         date: new Date(vouch.createdAt).toLocaleDateString()
     }));
 
@@ -175,7 +175,7 @@ app.get('/api/vouches', isAuthenticated, async (req, res) => {
         from: vouch.fromUsername,
         to: vouch.toUsername,
         rating: vouch.stars,
-        review: vouch.comment,
+        review: vouch.comment || 'No comment provided',
         date: new Date(vouch.createdAt).toLocaleDateString()
     }));
     
@@ -238,7 +238,7 @@ app.get('/api/stats', isAuthenticated, async (req, res) => {
 // API endpoint para obtener ticket específico
 app.get('/api/ticket/:id', isAuthenticated, async (req, res) => {
     const ticketId = parseInt(req.params.id);
-    const ticket = db.getTicketById(ticketId);
+    const ticket = await db.getTicketById(ticketId);
     
     if (!ticket) {
         return res.status(404).json({ error: 'Ticket not found' });
@@ -457,6 +457,8 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
+
 
 
 
