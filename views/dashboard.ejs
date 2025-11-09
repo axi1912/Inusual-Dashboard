@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Inusual</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, active: 'dashboard' }) %>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>📊 Dashboard</h1>
+            <p>Welcome back, <strong><%= user.username %></strong>!</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🎫</div>
+                <div class="stat-info">
+                    <h3 id="total-tickets"><%= stats.totalTickets %></h3>
+                    <p>Total Tickets</p>
+                </div>
+            </div>
+
+            <div class="stat-card active">
+                <div class="stat-icon">📂</div>
+                <div class="stat-info">
+                    <h3 id="active-tickets"><%= stats.activeTickets %></h3>
+                    <p>Active Tickets</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <h3 id="total-vouches"><%= stats.totalVouches %></h3>
+                    <p>Total Vouches</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <h3 id="verified-users"><%= stats.verifiedUsers %></h3>
+                    <p>Verified Users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Recent Tickets -->
+            <div class="card">
+                <h2>🎫 Recent Tickets</h2>
+                <div id="recent-tickets-list" style="margin-top: 1rem;">
+                    <p style="text-align: center; color: #888;">Loading tickets...</p>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card">
+                <h2>📈 Quick Stats</h2>
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="label">Closed Tickets</span>
+                        <span class="value"><%= stats.closedTickets %></span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="label">Avg Response</span>
+                        <span class="value">~5 min</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="label">Satisfaction</span>
+                        <span class="value">98%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bot Systems -->
+            <div class="card">
+                <h2>🤖 Bot Systems</h2>
+                <div class="bot-list" id="bot-status-list">
+                    <p style="text-align: center; color: #888; padding: 1rem;">Loading bot status...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cargar tickets recientes
+        async function loadRecentTickets() {
+            try {
+                const response = await fetch('/api/tickets');
+                const tickets = await response.json();
+                displayRecentTickets(tickets.slice(0, 5));
+            } catch (err) {
+                console.error('Error loading tickets:', err);
+                document.getElementById('recent-tickets-list').innerHTML = 
+                    '<p style="text-align: center; color: #ff4444;">Error loading tickets</p>';
+            }
+        }
+
+        function displayRecentTickets(tickets) {
+            const container = document.getElementById('recent-tickets-list');
+            
+            if (!tickets || tickets.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">No tickets yet</p>';
+                return;
+            }
+
+            container.innerHTML = tickets.map(ticket => {
+                const statusColor = ticket.status === 'open' ? '#ffcc00' : '#00D9A3';
+                const statusText = ticket.status === 'open' ? 'Open' : 'Closed';
+                
+                return `
+                    <div style="padding: 1rem; margin-bottom: 0.75rem; background: #0d0d0d; border-left: 3px solid ${statusColor}; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="color: #fff; font-weight: 600;">Ticket #${ticket.id}</div>
+                            <div style="color: #888; font-size: 0.9rem; margin-top: 0.25rem;">${ticket.user} - ${ticket.type}</div>
+                        </div>
+                        <div style="color: ${statusColor}; font-weight: 700; font-size: 0.9rem;">${statusText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Cargar estado de bots
+        async function loadBotStatus() {
+            try {
+                const response = await fetch('/api/bots/status');
+                const botsStatus = await response.json();
+                displayBotStatus(botsStatus);
+            } catch (err) {
+                console.error('Error loading bot status:', err);
+                displayBotStatus({});
+            }
+        }
+
+        function displayBotStatus(botsStatus) {
+            const container = document.getElementById('bot-status-list');
+            const bots = [
+                { id: 'inusual', name: 'Inusual Boosting', icon: '🎫' },
+                { id: 'verification', name: 'Verification Bot', icon: '✅' },
+                { id: 'vouch', name: 'Vouch Bot', icon: '⭐' },
+                { id: 'support', name: 'Support Bot', icon: '🆘' }
+            ];
+
+            container.innerHTML = bots.map(bot => {
+                const status = botsStatus[bot.id] || { running: false };
+                const isOnline = status.running;
+                const statusColor = isOnline ? '#00D9A3' : '#ff4444';
+                const statusText = isOnline ? 'Online' : 'Offline';
+                
+                return `
+                    <div style="display: flex; align-items: center; padding: 0.75rem; background: #0d0d0d; border-left: 3px solid ${statusColor}; border-radius: 6px; margin-bottom: 0.5rem;">
+                        <div style="font-size: 1.5rem; margin-right: 1rem;">${bot.icon}</div>
+                        <div style="flex: 1; color: #fff; font-weight: 500;">${bot.name}</div>
+                        <div style="color: ${statusColor}; font-weight: 700; font-size: 0.85rem;">${statusText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Auto-refresh cada 5 segundos
+        setInterval(() => {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('total-tickets').textContent = data.totalTickets;
+                    document.getElementById('active-tickets').textContent = data.activeTickets;
+                    document.getElementById('total-vouches').textContent = data.totalVouches;
+                    document.getElementById('verified-users').textContent = data.verifiedUsers;
+                })
+                .catch(err => console.error('Error updating stats:', err));
+            
+            loadRecentTickets();
+            loadBotStatus();
+        }, 5000);
+
+        // Inicializar al cargar
+        window.onload = () => {
+            loadRecentTickets();
+            loadBotStatus();
+        };
+    </script>
+</body>
+</html>

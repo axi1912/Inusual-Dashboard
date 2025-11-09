@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vouches - Inusual Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .filters-container {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            color: #00D9A3;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #00D9A3;
+        }
+
+        .vouch-count {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, active: 'vouches' }) %>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>⭐ Vouches</h1>
+            <p>User reviews and testimonials</p>
+            <button class="btn-filter" onclick="exportVouchesToCSV()" style="float: right;">📥 Export to CSV</button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="searchVouch">🔍 Search</label>
+                    <input type="text" id="searchVouch" placeholder="Search by username...">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterRating">⭐ Rating</label>
+                    <select id="filterRating">
+                        <option value="all">All Ratings</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (5 stars)</option>
+                        <option value="4">⭐⭐⭐⭐ (4 stars)</option>
+                        <option value="3">⭐⭐⭐ (3 stars)</option>
+                        <option value="2">⭐⭐ (2 stars)</option>
+                        <option value="1">⭐ (1 star)</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterSort">🔄 Sort By</label>
+                    <select id="filterSort">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="rating-high">Highest Rating</option>
+                        <option value="rating-low">Lowest Rating</option>
+                    </select>
+                </div>
+            </div>
+            <div class="vouch-count" id="vouchCount"></div>
+        </div>
+
+        <div class="vouches-grid" id="vouches-grid">
+            <% if (vouches.length === 0) { %>
+            <div style="text-align: center; padding: 4rem; color: #888; grid-column: 1/-1;">
+                <p>No vouches yet</p>
+            </div>
+            <% } else { %>
+            <% vouches.forEach(vouch => { %>
+            <div class="vouch-card">
+                <div class="vouch-header">
+                    <div class="vouch-users">
+                        <span class="from"><%= vouch.from %></span>
+                        <span class="arrow">→</span>
+                        <span class="to"><%= vouch.to %></span>
+                    </div>
+                    <div class="vouch-rating">
+                        <% for(let i = 0; i < vouch.rating; i++) { %>⭐<% } %>
+                    </div>
+                </div>
+                <div class="vouch-review">
+                    "<%= vouch.review %>"
+                </div>
+                <div class="vouch-date">
+                    <%= vouch.date %>
+                </div>
+            </div>
+            <% }); %>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        let allVouches = <%= JSON.stringify(vouches) %>;
+        let filteredVouches = [...allVouches];
+
+        // Auto-refresh cada 5 segundos
+        setInterval(() => {
+            fetch('/api/vouches')
+                .then(res => res.json())
+                .then(data => {
+                    allVouches = data;
+                    applyFilters();
+                })
+                .catch(err => console.error('Error updating vouches:', err));
+        }, 5000);
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchVouch').value.toLowerCase();
+            const ratingFilter = document.getElementById('filterRating').value;
+            const sortBy = document.getElementById('filterSort').value;
+
+            // Filtrar
+            filteredVouches = allVouches.filter(vouch => {
+                const matchesSearch = !searchTerm || 
+                    vouch.from.toLowerCase().includes(searchTerm) ||
+                    vouch.to.toLowerCase().includes(searchTerm);
+                
+                const matchesRating = ratingFilter === 'all' || 
+                    vouch.rating === parseInt(ratingFilter);
+                
+                return matchesSearch && matchesRating;
+            });
+
+            // Ordenar
+            filteredVouches.sort((a, b) => {
+                switch(sortBy) {
+                    case 'newest':
+                        return new Date(b.date) - new Date(a.date);
+                    case 'oldest':
+                        return new Date(a.date) - new Date(b.date);
+                    case 'rating-high':
+                        return b.rating - a.rating;
+                    case 'rating-low':
+                        return a.rating - b.rating;
+                    default:
+                        return 0;
+                }
+            });
+
+            updateVouchesGrid(filteredVouches);
+            updateVouchCount();
+        }
+
+        function updateVouchCount() {
+            const count = filteredVouches.length;
+            const total = allVouches.length;
+            const avgRating = filteredVouches.length > 0 
+                ? (filteredVouches.reduce((sum, v) => sum + v.rating, 0) / filteredVouches.length).toFixed(1)
+                : 0;
+            
+            document.getElementById('vouchCount').textContent = 
+                `Showing ${count} of ${total} vouch${total !== 1 ? 'es' : ''} | Average Rating: ${avgRating} ⭐`;
+        }
+
+        function updateVouchesGrid(vouches) {
+            const grid = document.getElementById('vouches-grid');
+            
+            if (vouches.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 4rem; color: #888; grid-column: 1/-1;"><p>No vouches yet</p></div>';
+                return;
+            }
+
+            grid.innerHTML = vouches.map(vouch => `
+                <div class="vouch-card">
+                    <div class="vouch-header">
+                        <div class="vouch-users">
+                            <span class="from">${vouch.from}</span>
+                            <span class="arrow">→</span>
+                            <span class="to">${vouch.to}</span>
+                        </div>
+                        <div class="vouch-rating">
+                            ${'⭐'.repeat(vouch.rating)}
+                        </div>
+                    </div>
+                    <div class="vouch-review">
+                        "${vouch.review}"
+                    </div>
+                    <div class="vouch-date">
+                        ${vouch.date}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners para filtros en tiempo real
+        document.getElementById('searchVouch').addEventListener('input', applyFilters);
+        document.getElementById('filterRating').addEventListener('change', applyFilters);
+        document.getElementById('filterSort').addEventListener('change', applyFilters);
+
+        // Inicializar
+        window.onload = () => {
+            updateVouchCount();
+        };
+
+        // Exportar a CSV
+        function exportVouchesToCSV() {
+            const csv = [
+                ['From', 'To', 'Rating', 'Review', 'Date'],
+                ...filteredVouches.map(vouch => [
+                    vouch.from,
+                    vouch.to,
+                    vouch.rating,
+                    `"${vouch.review.replace(/"/g, '""')}"`,
+                    vouch.date
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `vouches_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+    </script>
+</body>
+</html>

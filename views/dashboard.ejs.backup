@@ -1,0 +1,852 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Inusual</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .notification-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #00D9A3 0%, #00a87a 100%);
+            color: #000;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 217, 163, 0.4);
+            animation: slideInRight 0.5s, pulse 2s infinite;
+            z-index: 1000;
+            font-weight: 600;
+            display: none;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 5px 20px rgba(0, 217, 163, 0.4);
+            }
+            50% {
+                box-shadow: 0 5px 30px rgba(0, 217, 163, 0.6);
+            }
+        }
+
+        .pending-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .activity-feed {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .activity-feed h3 {
+            color: #00D9A3;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            background: #0d0d0d;
+            border-left: 3px solid #00D9A3;
+            margin-bottom: 0.75rem;
+            border-radius: 6px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .activity-item.new {
+            border-left-color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+        }
+
+        .activity-item.closed {
+            border-left-color: #888;
+        }
+
+        .activity-time {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .activity-text {
+            color: #fff;
+            margin: 0.5rem 0;
+        }
+
+        .activity-user {
+            color: #00D9A3;
+            font-weight: 600;
+        }
+
+        .metrics-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .metric-card h4 {
+            color: #00D9A3;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .trend-up {
+            color: #00D9A3;
+        }
+
+        .trend-down {
+            color: #ff4444;
+        }
+
+        .trend-neutral {
+            color: #888;
+        }
+
+        .chart-container {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .chart-container h3 {
+            color: #00D9A3;
+            margin-bottom: 1rem;
+        }
+
+        .quick-actions {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .quick-actions h3 {
+            color: #00D9A3;
+            margin-bottom: 1rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: #0d0d0d;
+            border: 2px solid #333;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            border-color: #00D9A3;
+            background: rgba(0, 217, 163, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .action-btn span {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .alerts-container {
+            margin-top: 1rem;
+        }
+
+        .alert {
+            background: #1a1a1a;
+            border-left: 4px solid;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .alert.warning {
+            border-left-color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+        }
+
+        .alert.error {
+            border-left-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .alert.info {
+            border-left-color: #00D9A3;
+            background: rgba(0, 217, 163, 0.1);
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+
+        .alert-text {
+            flex: 1;
+            color: #fff;
+        }
+
+        .top-users {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .top-users h3 {
+            color: #00D9A3;
+            margin-bottom: 1rem;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #0d0d0d;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-rank {
+            background: #00D9A3;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .user-info {
+            flex: 1;
+            color: #fff;
+        }
+
+        .user-count {
+            color: #00D9A3;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, active: 'dashboard' }) %>
+    
+    <!-- NotificaciÃ³n flotante -->
+    <div id="notification-badge" class="notification-badge"></div>
+    
+    <!-- Badge de tickets pendientes -->
+    <audio id="notificationSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjSO1fPTgjMGHm/A7+OZSA0LUrHn77BdGAg+mtvm" type="audio/wav">
+    </audio>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>ðŸ“Š Dashboard</h1>
+            <p>Welcome back, <strong><%= user.username %></strong>!</p>
+        </div>
+
+        <!-- Stats principales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">ðŸŽ«</div>
+                <div class="stat-info">
+                    <h3 id="total-tickets"><%= stats.totalTickets %></h3>
+                    <p>Total Tickets</p>
+                </div>
+            </div>
+
+            <div class="stat-card active" style="position: relative;">
+                <div class="stat-icon">ðŸ“‚</div>
+                <div class="stat-info">
+                    <h3 id="active-tickets"><%= stats.activeTickets %></h3>
+                    <p>Active Tickets</p>
+                </div>
+                <div id="pending-badge" class="pending-badge" style="display: none;"></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">â­</div>
+                <div class="stat-info">
+                    <h3 id="total-vouches"><%= stats.totalVouches %></h3>
+                    <p>Total Vouches</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">âœ…</div>
+                <div class="stat-info">
+                    <h3 id="verified-users"><%= stats.verifiedUsers %></h3>
+                    <p>Verified Users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="alerts-container" id="alerts-container"></div>
+
+        <!-- Grid principal: Activity Feed + MÃ©tricas -->
+        <div class="dashboard-grid">
+            <!-- Activity Feed -->
+            <div class="activity-feed">
+                <h3>ï¿½ Recent Tickets</h3>
+                <div id="recent-tickets-list">
+                    <div class="activity-item">
+                        <div class="activity-time">Loading activity...</div>
+                        <div class="activity-text">Fetching recent events...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÃ©tricas y widgets del lado derecho -->
+            <div class="metrics-grid">
+                <!-- MÃ©tricas avanzadas -->
+                <div class="metric-card">
+                    <h4>â±ï¸ Avg Response Time</h4>
+                    <div class="metric-value" id="avg-response">~5 min</div>
+                    <div class="metric-trend trend-up" id="response-trend">
+                        <span>â†—ï¸</span>
+                        <span>15% faster than yesterday</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <h4>ðŸ“Š Tickets Ratio</h4>
+                    <div class="metric-value" id="ticket-ratio">3:0</div>
+                    <div class="metric-trend" id="ratio-trend">
+                        <span>Open : Closed today</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <h4>ðŸ˜Š Satisfaction Rate</h4>
+                    <div class="metric-value" id="satisfaction">98%</div>
+                    <div class="metric-trend trend-up">
+                        <span>â†—ï¸</span>
+                        <span>2% increase</span>
+                    </div>
+                </div>
+
+                <!-- Top Users -->
+                <div class="top-users">
+                    <h3>ðŸ† System Status</h3>
+                    <div id="bot-status-list">
+                        <div style="text-align: center; color: #888; padding: 1rem;">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GrÃ¡fica de tendencia -->
+        <div class="chart-container">
+            <h3>ðŸ“ˆ Tickets Trend (Last 7 Days)</h3>
+            <canvas id="trendChart" height="80"></canvas>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>âš¡ Quick Actions</h3>
+            <div class="actions-grid">
+                <div class="action-btn" onclick="window.location.href='/tickets'">
+                    <span>ðŸ“</span>
+                    View All Tickets
+                </div>
+                <div class="action-btn" onclick="closeAllCompleted()">
+                    <span>âœ…</span>
+                    Close Completed
+                </div>
+                <div class="action-btn" onclick="exportDailyReport()">
+                    <span>ðŸ“„</span>
+                    Export Daily Report
+                </div>
+                <div class="action-btn" onclick="window.location.href='/bots'">
+                    <span>ðŸ¤–</span>
+                    Manage Bots
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let previousActiveTickets = <%= stats.activeTickets %>;
+        let previousTotalVouches = <%= stats.totalVouches %>;
+        let activityLog = [];
+        let trendChart = null;
+
+        // Inicializar grÃ¡fica de tendencia
+        function initTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Tickets Created',
+                        data: [],
+                        borderColor: '#00D9A3',
+                        backgroundColor: 'rgba(0, 217, 163, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Tickets Closed',
+                        data: [],
+                        borderColor: '#888',
+                        backgroundColor: 'rgba(136, 136, 136, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#888'
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#888'
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        }
+                    }
+                }
+            });
+
+            loadTrendData();
+        }
+
+        async function loadTrendData() {
+            try {
+                const response = await fetch('/api/trend-data');
+                if (!response.ok) throw new Error('API failed');
+                const data = await response.json();
+                
+                if (data && data.labels) {
+                    trendChart.data.labels = data.labels;
+                    trendChart.data.datasets[0].data = data.created;
+                    trendChart.data.datasets[1].data = data.closed;
+                    trendChart.update();
+                } else {
+                    generateSampleTrendData();
+                }
+            } catch (err) {
+                console.error('Error loading trend data:', err);
+                // Generar datos de ejemplo si no hay endpoint
+                generateSampleTrendData();
+            }
+        }
+
+        function generateSampleTrendData() {
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const created = [1, 0, 0, 1, 1, 0, 1];
+            const closed = [0, 0, 1, 0, 1, 1, 1];
+            
+            trendChart.data.labels = days;
+            trendChart.data.datasets[0].data = created;
+            trendChart.data.datasets[1].data = closed;
+            trendChart.update();
+        }
+
+        // Cargar activity feed
+        async function loadActivityFeed() {
+            try {
+                const response = await fetch('/api/activity-feed');
+                if (!response.ok) throw new Error('API failed');
+                const activities = await response.json();
+                if (activities && activities.length > 0) {
+                    displayActivityFeed(activities);
+                } else {
+                    generateSampleActivity();
+                }
+            } catch (err) {
+                console.error('Error loading activity feed:', err);
+                // Generar actividades de ejemplo
+                generateSampleActivity();
+            }
+        }
+
+        function generateSampleActivity() {
+            const now = Date.now();
+            const sampleActivities = [
+                { type: 'ticket_closed', ticketId: 7930, time: now - 60000 },
+                { type: 'ticket_closed', ticketId: 7572, time: now - 120000 },
+                { type: 'ticket_closed', ticketId: 5354, time: now - 180000 },
+                { type: 'ticket_created', user: 'axioms_', ticketId: 9584, time: now - 7200000 }
+            ];
+            displayActivityFeed(sampleActivities);
+        }
+
+        function displayActivityFeed(activities) {
+            const container = document.getElementById('recent-tickets-list');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = '<div class="activity-item"><div class="activity-text">No recent activity</div></div>';
+                return;
+            }
+
+            container.innerHTML = activities.map(activity => {
+                const timeAgo = getTimeAgo(activity.time);
+                let icon = 'ðŸ“';
+                let text = '';
+                let cssClass = 'activity-item';
+
+                switch (activity.type) {
+                    case 'ticket_created':
+                        icon = 'ðŸŽ«';
+                        text = `<span class="activity-user">${activity.user}</span> created ticket #${activity.ticketId}`;
+                        cssClass += ' new';
+                        break;
+                    case 'ticket_closed':
+                        icon = 'âœ…';
+                        text = `Ticket #${activity.ticketId} was closed`;
+                        cssClass += ' closed';
+                        break;
+                    case 'vouch_added':
+                        icon = 'â­';
+                        text = `<span class="activity-user">${activity.user}</span> left a ${activity.rating}-star review`;
+                        break;
+                    case 'user_verified':
+                        icon = 'âœ…';
+                        text = `<span class="activity-user">${activity.user}</span> was verified`;
+                        break;
+                    case 'bot_restarted':
+                        icon = 'ðŸ”„';
+                        text = `${activity.bot} was restarted`;
+                        break;
+                    default:
+                        text = activity.text || 'Activity occurred';
+                }
+
+                return `
+                    <div class="${cssClass}">
+                        <div class="activity-time">${icon} ${timeAgo}</div>
+                        <div class="activity-text">${text}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        // Cargar top users
+        async function loadTopUsers() {
+            try {
+                const response = await fetch('/api/top-users');
+                if (!response.ok) throw new Error('API failed');
+                const users = await response.json();
+                if (users && users.length > 0) {
+                    displayTopUsers(users);
+                } else {
+                    // Mostrar mensaje si no hay datos
+                    displayTopUsers([
+                        { username: 'axioms_', count: 4 }
+                    ]);
+                }
+            } catch (err) {
+                console.error('Error loading top users:', err);
+                // Datos de ejemplo
+                displayTopUsers([
+                    { username: 'axioms_', count: 4 }
+                ]);
+            }
+        }
+
+        function displayTopUsers(users) {
+            const container = document.getElementById('bot-status-list');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 1rem;">No data yet</div>';
+                return;
+            }
+
+            container.innerHTML = users.slice(0, 3).map((user, index) => `
+                <div class="user-item">
+                    <div class="user-rank">${index + 1}</div>
+                    <div class="user-info">${user.username}</div>
+                    <div class="user-count">${user.count} ticket${user.count !== 1 ? 's' : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        // Mostrar alertas
+        function checkAndShowAlerts(stats) {
+            const alertsContainer = document.getElementById('alerts-container');
+            const alerts = [];
+
+            // Alerta de tickets sin responder
+            if (stats.activeTickets > 5) {
+                alerts.push({
+                    type: 'warning',
+                    icon: 'âš ï¸',
+                    text: `${stats.activeTickets} tickets pending - High workload detected!`
+                });
+            }
+
+            // Alerta de tendencia positiva
+            if (stats.closedTickets > stats.activeTickets) {
+                alerts.push({
+                    type: 'info',
+                    icon: 'ðŸ“ˆ',
+                    text: `Great job! More tickets closed than open today.`
+                });
+            }
+
+            if (alerts.length === 0) {
+                alertsContainer.innerHTML = '';
+                return;
+            }
+
+            alertsContainer.innerHTML = alerts.map(alert => `
+                <div class="alert ${alert.type}">
+                    <div class="alert-icon">${alert.icon}</div>
+                    <div class="alert-text">${alert.text}</div>
+                </div>
+            `).join('');
+        }
+
+        // Auto-refresh stats cada 5 segundos
+        setInterval(() => {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    // Detectar nuevos tickets
+                    if (data.activeTickets > previousActiveTickets) {
+                        showNotification(`ðŸŽ« ${data.activeTickets - previousActiveTickets} new ticket(s)!`);
+                        playNotificationSound();
+                        updatePendingBadge(data.activeTickets);
+                        loadActivityFeed(); // Recargar activity feed
+                    }
+
+                    // Detectar nuevos vouches
+                    if (data.totalVouches > previousTotalVouches) {
+                        showNotification(`â­ ${data.totalVouches - previousTotalVouches} new vouch(es)!`);
+                        playNotificationSound();
+                        loadActivityFeed(); // Recargar activity feed
+                    }
+
+                    // Actualizar valores
+                    document.getElementById('total-tickets').textContent = data.totalTickets;
+                    document.getElementById('active-tickets').textContent = data.activeTickets;
+                    document.getElementById('total-vouches').textContent = data.totalVouches;
+                    document.getElementById('verified-users').textContent = data.verifiedUsers;
+                    
+                    // Actualizar ratio
+                    document.getElementById('ticket-ratio').textContent = `${data.activeTickets}:${data.closedTickets}`;
+
+                    // Verificar alertas
+                    checkAndShowAlerts(data);
+
+                    previousActiveTickets = data.activeTickets;
+                    previousTotalVouches = data.totalVouches;
+                })
+                .catch(err => console.error('Error updating stats:', err));
+        }, 5000);
+
+        // Auto-refresh activity feed cada 10 segundos
+        setInterval(loadActivityFeed, 10000);
+
+        function showNotification(message) {
+            const badge = document.getElementById('notification-badge');
+            badge.textContent = message;
+            badge.style.display = 'block';
+
+            setTimeout(() => {
+                badge.style.display = 'none';
+            }, 5000);
+        }
+
+        function playNotificationSound() {
+            try {
+                const audio = document.getElementById('notificationSound');
+                audio.play().catch(e => console.log('Audio play failed:', e));
+            } catch (e) {
+                console.log('Audio not supported:', e);
+            }
+        }
+
+        function updatePendingBadge(count) {
+            const badge = document.getElementById('pending-badge');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Quick Actions
+        async function closeAllCompleted() {
+            if (confirm('Close all completed tickets?')) {
+                alert('ðŸ”„ Closing completed tickets... (Feature coming soon)');
+            }
+        }
+
+        function exportDailyReport() {
+            alert('ðŸ“„ Generating daily report... (Feature coming soon)');
+        }
+
+        // Inicializar al cargar
+        window.onload = () => {
+            console.log('Dashboard initializing...');
+            
+            // Mostrar datos inmediatamente (no esperar)
+            updatePendingBadge(<%= stats.activeTickets %>);
+            checkAndShowAlerts(<%= JSON.stringify(stats) %>);
+            
+            // Mostrar datos de ejemplo inmediatamente para evitar "Loading..."
+            generateSampleActivity();
+            displayTopUsers([{ username: 'axioms_', count: 4 }]);
+            
+            // Inicializar grÃ¡fica
+            setTimeout(() => {
+                try {
+                    initTrendChart();
+                } catch (e) {
+                    console.error('Error initializing chart:', e);
+                }
+            }, 100);
+            
+            // Intentar cargar datos reales (actualizarÃ¡ sobre los de ejemplo)
+            setTimeout(() => {
+                loadActivityFeed().catch(e => console.log('Activity feed using fallback'));
+                loadTopUsers().catch(e => console.log('Top users using fallback'));
+            }, 500);
+            
+            console.log('Dashboard initialized!');
+        };
+
+        // Solicitar permiso para notificaciones del navegador
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>
+
+
+
+

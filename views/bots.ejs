@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bots Control - Inusual Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .bot-control-card {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .bot-control-card.online {
+            border-color: #00D9A3;
+            box-shadow: 0 0 20px rgba(0, 217, 163, 0.2);
+        }
+
+        .bot-control-card.offline {
+            border-color: #ff4444;
+        }
+
+        .bot-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .bot-name {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bot-name h3 {
+            color: #fff;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .bot-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            min-width: 90px;
+            justify-content: center;
+        }
+
+        .bot-status.online {
+            background: rgba(0, 217, 163, 0.2);
+            color: #00D9A3;
+        }
+
+        .bot-status.offline {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.online {
+            background: #00D9A3;
+        }
+
+        .status-indicator.offline {
+            background: #ff4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .bot-info {
+            background: #0d0d0d;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bot-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .bot-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .bot-info-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .bot-info-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .bot-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-start {
+            flex: 1;
+            background: linear-gradient(135deg, #00D9A3 0%, #00a87a 100%);
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 163, 0.3);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-stop {
+            flex: 1;
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .btn-stop:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .btn-stop:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-restart {
+            background: #ffbb33;
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-restart:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn-restart:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .control-all {
+            background: #1a1a1a;
+            border: 2px solid #00D9A3;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-all h2 {
+            color: #00D9A3;
+            margin-bottom: 1rem;
+        }
+
+        .control-all-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .console-output {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #0f0;
+        }
+
+        .console-line {
+            margin-bottom: 0.25rem;
+        }
+
+        .bot-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .bot-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #0d0d0d;
+            border-radius: 8px;
+            border: 1px solid #333;
+            transition: all 0.3s;
+        }
+
+        .bot-item:hover {
+            border-color: #00D9A3;
+            background: rgba(0, 217, 163, 0.05);
+        }
+
+        .bot-status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .bot-status-indicator.online {
+            background: #00D9A3;
+            box-shadow: 0 0 10px rgba(0, 217, 163, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .bot-status-indicator.offline {
+            background: #ff4444;
+        }
+
+        .bot-item .bot-name {
+            flex: 1;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .bot-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .bot-badge.online {
+            background: rgba(0, 217, 163, 0.2);
+            color: #00D9A3;
+        }
+
+        .bot-badge.offline {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, active: 'bots' }) %>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>🤖 Bots Control Panel</h1>
+            <p>Start, stop, and monitor all Discord bots</p>
+        </div>
+
+        <!-- Bot Systems Overview -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2>🎫 Bot Systems Status</h2>
+            <div class="bot-list" id="bot-systems-overview">
+                <div class="bot-item">
+                    <span class="bot-status-indicator" id="status-inusual"></span>
+                    <span class="bot-name">Inusual Boosting</span>
+                    <span class="bot-badge" id="badge-inusual">Loading...</span>
+                </div>
+                <div class="bot-item">
+                    <span class="bot-status-indicator" id="status-verification"></span>
+                    <span class="bot-name">Verification Bot</span>
+                    <span class="bot-badge" id="badge-verification">Loading...</span>
+                </div>
+                <div class="bot-item">
+                    <span class="bot-status-indicator" id="status-vouch"></span>
+                    <span class="bot-name">Vouch Bot</span>
+                    <span class="bot-badge" id="badge-vouch">Loading...</span>
+                </div>
+                <div class="bot-item">
+                    <span class="bot-status-indicator" id="status-support"></span>
+                    <span class="bot-name">Support Bot</span>
+                    <span class="bot-badge" id="badge-support">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control All Bots -->
+        <div class="control-all">
+            <h2>⚡ Quick Actions</h2>
+            <div class="control-all-actions">
+                <button class="btn-start btn-large" onclick="startAllBots()">
+                    🚀 Start All Bots
+                </button>
+                <button class="btn-stop btn-large" onclick="stopAllBots()">
+                    🛑 Stop All Bots
+                </button>
+                <button class="btn-restart btn-large" onclick="restartAllBots()">
+                    🔄 Restart All Bots
+                </button>
+            </div>
+        </div>
+
+        <!-- Individual Bot Controls -->
+        <div class="bots-grid" id="bots-grid">
+            <!-- Bots will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        const bots = [
+            {
+                id: 'inusual',
+                name: 'Inusual Boosting',
+                description: 'Boost & Custom Bot Tickets',
+                path: 'C:\\Users\\AXIOMS\\Desktop\\Inusual BOT',
+                icon: '🎫'
+            },
+            {
+                id: 'verification',
+                name: 'Verification Bot',
+                description: 'User Verification System',
+                path: 'C:\\Users\\AXIOMS\\Desktop\\Verification BOT',
+                icon: '✅'
+            },
+            {
+                id: 'vouch',
+                name: 'Vouch Bot',
+                description: 'Reviews & Testimonials',
+                path: 'C:\\Users\\AXIOMS\\Desktop\\Vouch BOT',
+                icon: '⭐'
+            },
+            {
+                id: 'support',
+                name: 'Support Bot',
+                description: 'General Support Tickets',
+                path: 'C:\\Users\\AXIOMS\\Desktop\\Support BOT',
+                icon: '🆘'
+            }
+        ];
+
+        let botsStatus = {};
+
+        // Cargar estado inicial
+        async function loadBotsStatus() {
+            try {
+                const response = await fetch('/api/bots/status');
+                const data = await response.json();
+                botsStatus = data;
+                renderBots();
+            } catch (error) {
+                console.error('Error loading bots status:', error);
+            }
+        }
+
+        function renderBots() {
+            const grid = document.getElementById('bots-grid');
+            
+            grid.innerHTML = bots.map(bot => {
+                const status = botsStatus[bot.id] || { running: false, uptime: 0 };
+                const isOnline = status.running;
+                
+                return `
+                    <div class="bot-control-card ${isOnline ? 'online' : 'offline'}">
+                        <div class="bot-header">
+                            <div class="bot-name">
+                                <span style="font-size: 2rem;">${bot.icon}</span>
+                                <h3>${bot.name}</h3>
+                            </div>
+                            <div class="bot-status ${isOnline ? 'online' : 'offline'}">
+                                <div class="status-indicator ${isOnline ? 'online' : 'offline'}"></div>
+                                ${isOnline ? 'Online' : 'Offline'}
+                            </div>
+                        </div>
+
+                        <div class="bot-info">
+                            <div class="bot-info-item">
+                                <span class="bot-info-label">Description</span>
+                                <span class="bot-info-value">${bot.description}</span>
+                            </div>
+                            <div class="bot-info-item">
+                                <span class="bot-info-label">Uptime</span>
+                                <span class="bot-info-value">${formatUptime(status.uptime || 0)}</span>
+                            </div>
+                            <div class="bot-info-item">
+                                <span class="bot-info-label">PID</span>
+                                <span class="bot-info-value">${status.pid || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        <div class="bot-actions">
+                            <button class="btn-start" onclick="startBot('${bot.id}')" ${isOnline ? 'disabled' : ''}>
+                                ▶️ Start
+                            </button>
+                            <button class="btn-stop" onclick="stopBot('${bot.id}')" ${!isOnline ? 'disabled' : ''}>
+                                ⏹️ Stop
+                            </button>
+                            <button class="btn-restart" onclick="restartBot('${bot.id}')" ${!isOnline ? 'disabled' : ''}>
+                                🔄 Restart
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Actualizar resumen de estado
+            updateBotsOverview();
+        }
+
+        function updateBotsOverview() {
+            const statusMap = {
+                'inusual': botsStatus['inusual'] || { running: false },
+                'verification': botsStatus['verification'] || { running: false },
+                'vouch': botsStatus['vouch'] || { running: false },
+                'support': botsStatus['support'] || { running: false }
+            };
+
+            // Actualizar indicadores
+            Object.keys(statusMap).forEach(botId => {
+                const indicator = document.getElementById(`status-${botId}`);
+                const badge = document.getElementById(`badge-${botId}`);
+                const isOnline = statusMap[botId].running;
+
+                if (indicator) {
+                    indicator.className = `bot-status-indicator ${isOnline ? 'online' : 'offline'}`;
+                }
+
+                if (badge) {
+                    badge.className = `bot-badge ${isOnline ? 'online' : 'offline'}`;
+                    badge.textContent = isOnline ? 'Online' : 'Offline';
+                }
+            });
+        }
+
+        function formatUptime(seconds) {
+            if (seconds < 60) return `${seconds}s`;
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+            return `${Math.floor(seconds / 86400)}d ${Math.floor((seconds % 86400) / 3600)}h`;
+        }
+
+        async function startBot(botId) {
+            try {
+                const response = await fetch(`/api/bots/${botId}/start`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification(`✅ ${bots.find(b => b.id === botId).name} started!`);
+                    setTimeout(loadBotsStatus, 1000);
+                } else {
+                    showNotification(`❌ Failed to start bot: ${data.error}`);
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function stopBot(botId) {
+            try {
+                const response = await fetch(`/api/bots/${botId}/stop`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification(`🛑 ${bots.find(b => b.id === botId).name} stopped!`);
+                    setTimeout(loadBotsStatus, 1000);
+                } else {
+                    showNotification(`❌ Failed to stop bot: ${data.error}`);
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function restartBot(botId) {
+            await stopBot(botId);
+            setTimeout(() => startBot(botId), 2000);
+        }
+
+        async function startAllBots() {
+            showNotification('🚀 Starting all bots...');
+            for (const bot of bots) {
+                await startBot(bot.id);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        async function stopAllBots() {
+            showNotification('🛑 Stopping all bots...');
+            for (const bot of bots) {
+                if (botsStatus[bot.id]?.running) {
+                    await stopBot(bot.id);
+                }
+            }
+        }
+
+        async function restartAllBots() {
+            await stopAllBots();
+            setTimeout(startAllBots, 3000);
+        }
+
+        function showNotification(message) {
+            alert(message); // Podrías mejorar esto con una notificación bonita
+        }
+
+        // Auto-refresh cada 5 segundos
+        setInterval(loadBotsStatus, 5000);
+
+        // Cargar al inicio
+        loadBotsStatus();
+    </script>
+</body>
+</html>

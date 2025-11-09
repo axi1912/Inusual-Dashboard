@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - Inusual Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .chart-card h3 {
+            color: #00D9A3;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, active: 'stats' }) %>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>📈 Statistics</h1>
+            <p>Detailed analytics and metrics</p>
+        </div>
+
+        <!-- Gráficas -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>📊 Tickets Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="ticketsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>⭐ Vouches Ratings</h3>
+                <div class="chart-container">
+                    <canvas id="vouchesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>📈 Tickets Status</h3>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>✅ Verification Progress</h3>
+                <div class="chart-container">
+                    <canvas id="verificationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="card">
+                <h2>🎫 Tickets Overview</h2>
+                <div class="stats-list">
+                    <div class="stat-item">
+                        <span>Total Tickets</span>
+                        <strong><%= stats.tickets.total %></strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Boost Tickets</span>
+                        <strong><%= stats.tickets.boost %></strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Custom Bot Tickets</span>
+                        <strong><%= stats.tickets.customBot %></strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Support Tickets</span>
+                        <strong><%= stats.tickets.support %></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⭐ Vouches Analytics</h2>
+                <div class="stats-list">
+                    <div class="stat-item">
+                        <span>Total Vouches</span>
+                        <strong><%= stats.vouches.total %></strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Average Rating</span>
+                        <strong><%= stats.vouches.average %> ⭐</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>5-Star Reviews</span>
+                        <strong><%= stats.vouches.fiveStars %></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>✅ Verification Stats</h2>
+                <div class="stats-list">
+                    <div class="stat-item">
+                        <span>Verified Users</span>
+                        <strong><%= stats.verification.verified %></strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Pending</span>
+                        <strong><%= stats.verification.pending %></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración común para las gráficas
+        const chartColors = {
+            mint: '#00D9A3',
+            mintLight: '#33E4B5',
+            mintDark: '#00A87A',
+            red: '#ff4444',
+            yellow: '#ffbb33',
+            blue: '#33b5e5',
+            purple: '#aa66cc'
+        };
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#fff',
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            }
+        };
+
+        // Gráfica de distribución de tickets
+        const ticketsChart = new Chart(document.getElementById('ticketsChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Boost', 'Custom Bot', 'Support'],
+                datasets: [{
+                    data: [<%= stats.tickets.boost %>, <%= stats.tickets.customBot %>, <%= stats.tickets.support %>],
+                    backgroundColor: [chartColors.mint, chartColors.blue, chartColors.purple],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    ...commonOptions.plugins,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#fff',
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfica de ratings de vouches (simulada - necesitarías datos reales)
+        const vouchesChart = new Chart(document.getElementById('vouchesChart'), {
+            type: 'bar',
+            data: {
+                labels: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
+                datasets: [{
+                    label: 'Number of Reviews',
+                    data: [0, 0, 0, 0, <%= stats.vouches.fiveStars %>],
+                    backgroundColor: chartColors.mint,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#888',
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: '#333'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#888'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfica de status de tickets
+        const statusChart = new Chart(document.getElementById('statusChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Open', 'Closed'],
+                datasets: [{
+                    data: [<%= stats.tickets.total - (stats.tickets.boost + stats.tickets.customBot + stats.tickets.support - stats.tickets.total) || 0 %>, <%= stats.tickets.total - (stats.tickets.total - (stats.tickets.boost + stats.tickets.customBot + stats.tickets.support - stats.tickets.total)) || 0 %>],
+                    backgroundColor: [chartColors.mint, chartColors.red],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    ...commonOptions.plugins,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#fff',
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfica de verificación
+        const verificationChart = new Chart(document.getElementById('verificationChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Verified', 'Pending'],
+                datasets: [{
+                    data: [<%= stats.verification.verified %>, <%= stats.verification.pending %>],
+                    backgroundColor: [chartColors.mint, chartColors.yellow],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    ...commonOptions.plugins,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#fff',
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
+
+        // Auto-refresh cada 10 segundos
+        setInterval(() => {
+            location.reload();
+        }, 10000);
+    </script>
+</body>
+</html>

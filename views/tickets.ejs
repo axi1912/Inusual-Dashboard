@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets - Inusual Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid #00D9A3;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 217, 163, 0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #00D9A3 0%, #00a87a 100%);
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #000;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: #000;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .close:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .ticket-detail {
+            margin-bottom: 1.5rem;
+        }
+
+        .ticket-detail-label {
+            color: #00D9A3;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ticket-detail-value {
+            color: #fff;
+            font-size: 1.1rem;
+            background: #0d0d0d;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #00D9A3;
+        }
+
+        .ticket-status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .ticket-status-badge.open {
+            background: rgba(0, 217, 163, 0.2);
+            color: #00D9A3;
+            border: 1px solid #00D9A3;
+        }
+
+        .ticket-status-badge.closed {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+
+        .filters-container {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            color: #00D9A3;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #00D9A3;
+            box-shadow: 0 0 0 2px rgba(0, 217, 163, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, #00D9A3 0%, #00a87a 100%);
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 163, 0.3);
+        }
+
+        .btn-reset {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #444;
+        }
+
+        .ticket-count {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, active: 'tickets' }) %>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>🎫 Tickets</h1>
+            <p>Manage all support and purchase tickets</p>
+            <button class="btn-filter" id="exportBtn" style="float: right;">📥 Export to CSV</button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="searchInput">🔍 Search</label>
+                    <input type="text" id="searchInput" placeholder="Search by ID or username...">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterStatus">📊 Status</label>
+                    <select id="filterStatus">
+                        <option value="all">All Status</option>
+                        <option value="open">Open</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterType">📋 Type</label>
+                    <select id="filterType">
+                        <option value="all">All Types</option>
+                        <option value="boost">Boost</option>
+                        <option value="custom bot">Custom Bot</option>
+                        <option value="support">Support</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterSort">🔄 Sort By</label>
+                    <select id="filterSort">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="id-asc">ID (Low to High)</option>
+                        <option value="id-desc">ID (High to Low)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="btn-filter" id="applyFiltersBtn">Apply Filters</button>
+                <button class="btn-reset" id="resetFiltersBtn">Reset</button>
+                <span class="ticket-count" id="ticketCount"></span>
+            </div>
+        </div>
+
+        <div class="tickets-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tickets-tbody">
+                    <% if (tickets.length === 0) { %>
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: #888;">No tickets yet</td>
+                    </tr>
+                    <% } else { %>
+                    <% tickets.forEach(ticket => { %>
+                    <tr>
+                        <td>#<%= ticket.id %></td>
+                        <td><%= ticket.user %></td>
+                        <td><span class="badge <%= ticket.type.toLowerCase().replace(' ', '-') %>"><%= ticket.type %></span></td>
+                        <td><span class="status <%= ticket.status.toLowerCase() %>"><%= ticket.status %></span></td>
+                        <td><%= ticket.created %></td>
+                        <td>
+                            <button class="btn-small" onclick="viewTicket(<%= ticket.id %>)">View</button>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar detalles del ticket -->
+    <div id="ticketModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Ticket Details</h2>
+                <button class="close" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div style="text-align: center; padding: 2rem; color: #888;">
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allTickets = [];
+        let filteredTickets = [];
+
+        // Cargar tickets iniciales
+        async function loadTickets() {
+            try {
+                const response = await fetch('/api/tickets');
+                const data = await response.json();
+                allTickets = data;
+                applyFilters();
+            } catch (err) {
+                console.error('Error loading tickets:', err);
+            }
+        }
+
+        // Auto-refresh cada 5 segundos
+        setInterval(() => {
+            fetch('/api/tickets')
+                .then(res => res.json())
+                .then(data => {
+                    allTickets = data;
+                    applyFilters(); // Re-aplicar filtros con datos nuevos
+                })
+                .catch(err => console.error('Error updating tickets:', err));
+        }, 5000);
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const typeFilter = document.getElementById('filterType').value;
+            const sortBy = document.getElementById('filterSort').value;
+
+            // Filtrar
+            filteredTickets = allTickets.filter(ticket => {
+                const matchesSearch = !searchTerm || 
+                    ticket.id.toString().includes(searchTerm) || 
+                    ticket.user.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = statusFilter === 'all' || 
+                    ticket.status.toLowerCase() === statusFilter;
+                
+                const matchesType = typeFilter === 'all' || 
+                    ticket.type.toLowerCase() === typeFilter;
+                
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            // Ordenar
+            filteredTickets.sort((a, b) => {
+                switch(sortBy) {
+                    case 'newest':
+                        return new Date(b.createdAt || b.created) - new Date(a.createdAt || a.created);
+                    case 'oldest':
+                        return new Date(a.createdAt || a.created) - new Date(b.createdAt || b.created);
+                    case 'id-asc':
+                        return a.id - b.id;
+                    case 'id-desc':
+                        return b.id - a.id;
+                    default:
+                        return 0;
+                }
+            });
+
+            updateTicketsTable(filteredTickets);
+            updateTicketCount();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterStatus').value = 'all';
+            document.getElementById('filterType').value = 'all';
+            document.getElementById('filterSort').value = 'newest';
+            applyFilters();
+        }
+
+        function updateTicketCount() {
+            const count = filteredTickets.length;
+            const total = allTickets.length;
+            document.getElementById('ticketCount').textContent = 
+                `Showing ${count} of ${total} ticket${total !== 1 ? 's' : ''}`;
+        }
+
+        function updateTicketsTable(tickets) {
+            const tbody = document.getElementById('tickets-tbody');
+            
+            if (tickets.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #888;">No tickets yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tickets.map(ticket => `
+                <tr>
+                    <td>#${ticket.id}</td>
+                    <td>${ticket.user}</td>
+                    <td><span class="badge ${ticket.type.toLowerCase().replace(' ', '-')}">${ticket.type}</span></td>
+                    <td><span class="status ${ticket.status}">${ticket.status === 'open' ? 'Open' : 'Closed'}</span></td>
+                    <td>${ticket.created}</td>
+                    <td>
+                        <button class="btn-small view-ticket-btn" data-ticket-id="${ticket.id}">View</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Agregar event listeners a botones View
+            document.querySelectorAll('.view-ticket-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const ticketId = this.getAttribute('data-ticket-id');
+                    viewTicket(ticketId);
+                });
+            });
+        }
+
+        function viewTicket(ticketId) {
+            // Mostrar modal
+            document.getElementById('ticketModal').style.display = 'block';
+            
+            // Cargar datos del ticket
+            fetch(`/api/ticket/${ticketId}`)
+                .then(res => res.json())
+                .then(ticket => {
+                    displayTicketDetails(ticket);
+                })
+                .catch(err => {
+                    console.error('Error loading ticket:', err);
+                    document.getElementById('modalBody').innerHTML = '<div style="text-align: center; padding: 2rem; color: #ff4444;">Error loading ticket details</div>';
+                });
+        }
+
+        function displayTicketDetails(ticket) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = `Ticket #${ticket.id}`;
+            
+            let detailsHTML = `
+                <div class="ticket-detail">
+                    <span class="ticket-detail-label">👤 User</span>
+                    <div class="ticket-detail-value">${ticket.username}</div>
+                </div>
+                
+                <div class="ticket-detail">
+                    <span class="ticket-detail-label">📋 Type</span>
+                    <div class="ticket-detail-value">${ticket.type}</div>
+                </div>
+                
+                <div class="ticket-detail">
+                    <span class="ticket-detail-label">📊 Status</span>
+                    <div class="ticket-detail-value">
+                        <span class="ticket-status-badge ${ticket.status}">${ticket.status.toUpperCase()}</span>
+                    </div>
+                </div>
+                
+                <div class="ticket-detail">
+                    <span class="ticket-detail-label">📅 Created</span>
+                    <div class="ticket-detail-value">${new Date(ticket.createdAt).toLocaleString()}</div>
+                </div>
+            `;
+            
+            // Agregar detalles específicos si existen
+            if (ticket.details) {
+                detailsHTML += '<div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #333;"><h3 style="color: #00D9A3; margin-bottom: 1rem;">📦 Order Details</h3>';
+                
+                if (ticket.details.package) {
+                    detailsHTML += `
+                        <div class="ticket-detail">
+                            <span class="ticket-detail-label">📦 Package</span>
+                            <div class="ticket-detail-value">${ticket.details.package}</div>
+                        </div>
+                    `;
+                }
+                
+                if (ticket.details.botType) {
+                    detailsHTML += `
+                        <div class="ticket-detail">
+                            <span class="ticket-detail-label">🤖 Bot Type</span>
+                            <div class="ticket-detail-value">${ticket.details.botType}</div>
+                        </div>
+                    `;
+                }
+                
+                if (ticket.details.price) {
+                    detailsHTML += `
+                        <div class="ticket-detail">
+                            <span class="ticket-detail-label">💰 Price</span>
+                            <div class="ticket-detail-value">${ticket.details.price}</div>
+                        </div>
+                    `;
+                }
+                
+                if (ticket.details.quantity) {
+                    detailsHTML += `
+                        <div class="ticket-detail">
+                            <span class="ticket-detail-label">📊 Quantity</span>
+                            <div class="ticket-detail-value">${ticket.details.quantity} boosts</div>
+                        </div>
+                    `;
+                }
+                
+                if (ticket.details.duration) {
+                    detailsHTML += `
+                        <div class="ticket-detail">
+                            <span class="ticket-detail-label">⏰ Duration</span>
+                            <div class="ticket-detail-value">${ticket.details.duration}</div>
+                        </div>
+                    `;
+                }
+                
+                detailsHTML += '</div>';
+            }
+            
+            // Agregar información de cierre si existe
+            if (ticket.closedAt) {
+                detailsHTML += `
+                    <div class="ticket-detail">
+                        <span class="ticket-detail-label">🔒 Closed</span>
+                        <div class="ticket-detail-value">${new Date(ticket.closedAt).toLocaleString()}</div>
+                    </div>
+                `;
+            }
+            
+            // Botones de acción
+            if (ticket.status === 'open') {
+                detailsHTML += `
+                    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #333;">
+                        <h3 style="color: #00D9A3; margin-bottom: 1rem;">⚡ Actions</h3>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button class="btn-filter close-ticket-btn" data-ticket-id="${ticket.id}" style="flex: 1; min-width: 150px;">
+                                🔒 Close Ticket
+                            </button>
+                            <button class="btn-reset add-note-btn" data-ticket-id="${ticket.id}" style="flex: 1; min-width: 150px; color: #fff;">
+                                📝 Add Note
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            modalBody.innerHTML = detailsHTML;
+
+            // Agregar event listeners a botones de acción
+            const closeBtn = modalBody.querySelector('.close-ticket-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    const ticketId = this.getAttribute('data-ticket-id');
+                    closeTicketAction(ticketId);
+                });
+            }
+
+            const noteBtn = modalBody.querySelector('.add-note-btn');
+            if (noteBtn) {
+                noteBtn.addEventListener('click', function() {
+                    const ticketId = this.getAttribute('data-ticket-id');
+                    addNoteAction(ticketId);
+                });
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('ticketModal').style.display = 'none';
+        }
+
+        async function closeTicketAction(ticketId) {
+            if (!confirm('Are you sure you want to close this ticket?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/ticket/${ticketId}/close`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('✅ Ticket closed successfully!');
+                    closeModal();
+                    // Forzar actualización
+                    const ticketsData = await fetch('/api/tickets').then(r => r.json());
+                    allTickets = ticketsData;
+                    applyFilters();
+                } else {
+                    alert('❌ Error closing ticket');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error closing ticket');
+            }
+        }
+
+        function addNoteAction(ticketId) {
+            const note = prompt('Enter note for ticket #' + ticketId + ':');
+            if (note && note.trim()) {
+                // Por ahora solo mostrar mensaje (implementación completa requiere modificar DB)
+                alert(`📝 Note added to ticket #${ticketId}:\n"${note}"\n\n(Note: Full implementation coming soon)`);
+            }
+        }
+
+        // Cerrar modal al hacer click fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('ticketModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Aplicar filtros en tiempo real mientras escribes
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('filterStatus').addEventListener('change', applyFilters);
+        document.getElementById('filterType').addEventListener('change', applyFilters);
+        document.getElementById('filterSort').addEventListener('change', applyFilters);
+
+        // Event listeners para botones
+        document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
+        document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
+        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+
+        // Inicializar al cargar
+        window.onload = () => {
+            loadTickets(); // Cargar tickets desde API
+        };
+
+        // Exportar a CSV
+        function exportToCSV() {
+            const csv = [
+                ['ID', 'User', 'Type', 'Status', 'Created', 'Details'],
+                ...filteredTickets.map(ticket => [
+                    ticket.id,
+                    ticket.user,
+                    ticket.type,
+                    ticket.status,
+                    ticket.created,
+                    ticket.details ? JSON.stringify(ticket.details) : 'N/A'
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tickets_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+    </script>
+</body>
+</html>

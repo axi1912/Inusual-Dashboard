@@ -1,0 +1,67 @@
+<nav class="navbar">
+    <div class="nav-brand">
+        <h2>🎫 INUSUAL</h2>
+    </div>
+    <div class="nav-links">
+        <a href="/dashboard" class="<%= active === 'dashboard' ? 'active' : '' %>">
+            📊 Dashboard
+        </a>
+        <a href="/tickets" class="<%= active === 'tickets' ? 'active' : '' %>">
+            🎫 Tickets
+        </a>
+        <a href="/vouches" class="<%= active === 'vouches' ? 'active' : '' %>">
+            ⭐ Vouches
+        </a>
+        <a href="/stats" class="<%= active === 'stats' ? 'active' : '' %>">
+            📈 Stats
+        </a>
+        <a href="/bots" class="<%= active === 'bots' ? 'active' : '' %>">
+            🤖 Bots
+        </a>
+    </div>
+    <div class="nav-user">
+        <button id="theme-toggle" onclick="toggleTheme()" style="background: #333; border: 1px solid #555; color: #fff; padding: 0.5rem 1rem; border-radius: 8px; margin-right: 1rem; cursor: pointer; font-size: 1.2rem;">
+            🌙
+        </button>
+        <div class="user-info">
+            <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png" alt="Avatar">
+            <span><%= user.username %></span>
+        </div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+</nav>
+
+<script>
+    // Función global de tema
+    function toggleTheme() {
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    }
+
+    function applyTheme(theme) {
+        const btn = document.getElementById('theme-toggle');
+        
+        if (theme === 'light') {
+            document.body.style.setProperty('--bg-primary', '#f5f5f5');
+            document.body.style.setProperty('--bg-secondary', '#ffffff');
+            document.body.style.setProperty('--text-primary', '#000000');
+            document.body.style.setProperty('--text-secondary', '#333333');
+            document.body.style.setProperty('--border-color', '#e0e0e0');
+            btn.textContent = '☀️';
+        } else {
+            document.body.style.setProperty('--bg-primary', '#0d0d0d');
+            document.body.style.setProperty('--bg-secondary', '#1a1a1a');
+            document.body.style.setProperty('--text-primary', '#ffffff');
+            document.body.style.setProperty('--text-secondary', '#888888');
+            document.body.style.setProperty('--border-color', '#333333');
+            btn.textContent = '🌙';
+        }
+    }
+
+    // Aplicar tema guardado al cargar
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+</script>
