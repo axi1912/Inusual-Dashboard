@@ -36,7 +36,7 @@
     function toggleTheme() {
         const currentTheme = localStorage.getItem('theme') || 'dark';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
+
         localStorage.setItem('theme', newTheme);
         applyTheme(newTheme);
     }
