@@ -155,8 +155,8 @@ app.get('/vouches', isAuthenticated, async (req, res) => {
         id: vouch.id,
         from: vouch.fromUsername,
         to: vouch.toUsername,
-        rating: vouch.rating,
-        review: vouch.review,
+        rating: vouch.stars,
+        review: vouch.comment,
         date: new Date(vouch.createdAt).toLocaleDateString()
     }));
 
@@ -174,8 +174,8 @@ app.get('/api/vouches', isAuthenticated, async (req, res) => {
         id: vouch.id,
         from: vouch.fromUsername,
         to: vouch.toUsername,
-        rating: vouch.rating,
-        review: vouch.review,
+        rating: vouch.stars,
+        review: vouch.comment,
         date: new Date(vouch.createdAt).toLocaleDateString()
     }));
     
@@ -322,7 +322,7 @@ app.get('/api/activity-feed', isAuthenticated, async (req, res) => {
         activities.push({
             type: 'vouch_added',
             user: vouch.fromUsername,
-            rating: vouch.rating,
+            rating: vouch.stars,
             time: new Date(vouch.createdAt).getTime()
         });
     });
@@ -457,6 +457,7 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
 
 
 
