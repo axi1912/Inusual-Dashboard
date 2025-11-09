@@ -147,7 +147,7 @@ app.get('/api/tickets', isAuthenticated, (req, res) => {
 });
 
 // Página de vouches
-app.get('/vouches', isAuthenticated, (req, res) => {
+app.get('/vouches', isAuthenticated, async (req, res) => {
     const allVouches = await db.getAllVouches();
     
     // Formatear para la vista
@@ -167,7 +167,7 @@ app.get('/vouches', isAuthenticated, (req, res) => {
 });
 
 // API endpoint para vouches en tiempo real
-app.get('/api/vouches', isAuthenticated, (req, res) => {
+app.get('/api/vouches', isAuthenticated, async (req, res) => {
     const allVouches = await db.getAllVouches();
     
     const vouches = allVouches.map(vouch => ({
@@ -223,20 +223,20 @@ app.get('/stats', isAuthenticated, (req, res) => {
 });
 
 // Página de control de bots
-app.get('/bots', isAuthenticated, (req, res) => {
+app.get('/bots', isAuthenticated, async (req, res) => {
     res.render('bots', {
         user: req.user
     });
 });
 
 // API endpoints para datos en tiempo real
-app.get('/api/stats', isAuthenticated, (req, res) => {
+app.get('/api/stats', isAuthenticated, async (req, res) => {
     const stats = await db.getStats();
     res.json(stats);
 });
 
 // API endpoint para obtener ticket específico
-app.get('/api/ticket/:id', isAuthenticated, (req, res) => {
+app.get('/api/ticket/:id', isAuthenticated, async (req, res) => {
     const ticketId = parseInt(req.params.id);
     const ticket = db.getTicketById(ticketId);
     
@@ -360,7 +360,7 @@ const botsConfig = {
 };
 
 // API: Obtener estado de todos los bots
-app.get('/api/bots/status', isAuthenticated, (req, res) => {
+app.get('/api/bots/status', isAuthenticated, async (req, res) => {
     const status = {};
     
     for (const [id, config] of Object.entries(botsConfig)) {
@@ -457,6 +457,7 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
 
 
 
