@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Inusual</title>
-    <link rel="stylesheet" href="/css/style.css">`n    <link rel="stylesheet" href="/css/glassmorphism.css">`n    <link rel="stylesheet" href="/css/themes.css">`n    <link rel="stylesheet" href="/css/mobile.css">
+    <link rel="stylesheet" href="/css/style.css">`n    <link rel="stylesheet" href="/css/glassmorphism.css">`n    <link rel="stylesheet" href="/css/themes.css">`n    <link rel="stylesheet" href="/css/mobile.css">`n    <link rel="stylesheet" href="/css/charts.css">`n    <link rel="stylesheet" href="/css/visual-effects.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -18,7 +18,7 @@
 
         <!-- Stats Grid -->
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card hover-particles magnetic scroll-reveal">
                 <div class="stat-icon">🎫</div>
                 <div class="stat-info">
                     <h3 id="total-tickets"><%= stats.totalTickets %></h3>
@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card hover-particles magnetic scroll-reveal">
                 <div class="stat-icon">⭐</div>
                 <div class="stat-info">
                     <h3 id="total-vouches"><%= stats.totalVouches %></h3>
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card hover-particles magnetic scroll-reveal">
                 <div class="stat-icon">✅</div>
                 <div class="stat-info">
                     <h3 id="verified-users"><%= stats.verifiedUsers %></h3>
@@ -187,5 +187,5 @@
             loadBotStatus();
         };
     </script>
-    <script src="/js/animations.js"></script>`n</body>
+    <script src="/js/animations.js"></script>`n    <script src="/js/charts.js"></script>`n    <script src="/js/visual-effects.js"></script>`n</body>
 </html>
