@@ -194,9 +194,9 @@ app.get('/stats', isAuthenticated, async (req, res) => {
     const supportTickets = allTickets.filter(t => t.type === 'Support').length;
     
     // Calcular promedio de rating
-    const totalRating = allVouches.reduce((sum, v) => sum + v.rating, 0);
+    const totalRating = allVouches.reduce((sum, v) => sum + v.stars, 0);
     const avgRating = allVouches.length > 0 ? (totalRating / allVouches.length).toFixed(1) : 0;
-    const fiveStarVouches = allVouches.filter(v => v.rating === 5).length;
+    const fiveStarVouches = allVouches.filter(v => v.stars === 5).length;
 
     const statsData = {
         tickets: {
@@ -457,6 +457,7 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
 
 
 
