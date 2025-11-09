@@ -4,7 +4,7 @@ const session = require('express-session');
 const passport = require('passport');
 const DiscordStrategy = require('passport-discord').Strategy;
 const path = require('path');
-const db = require('../../Data/db-mongo');
+const db = require('../Data/db-mongo');
 
 // Conectar a MongoDB al iniciar
 db.connectDB().then(() => {
