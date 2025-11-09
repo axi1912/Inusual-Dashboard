@@ -150,16 +150,16 @@ class VisualEffects {
         this.particleContainer = particleSystem;
         this.generateParticles();
 
-        // Generate new particles periodically
+                // Generate particles every 6 seconds
         setInterval(() => {
-            if (!this.isLoading && this.particles.length < 20) {
+            if (this.particles.length < 8) { // Límite reducido
                 this.generateParticles();
             }
-        }, 2000);
+        }, 6000);
     }
 
     generateParticles() {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) { // Menos partículas por generación
             const particle = document.createElement("div");
             particle.className = "particle";
             

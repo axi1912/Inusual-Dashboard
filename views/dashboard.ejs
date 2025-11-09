@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Inusual</title>
-    <link rel="stylesheet" href="/css/style.css">`n    <link rel="stylesheet" href="/css/glassmorphism.css">`n    <link rel="stylesheet" href="/css/themes.css">`n    <link rel="stylesheet" href="/css/mobile.css">`n    <link rel="stylesheet" href="/css/charts.css">`n    <link rel="stylesheet" href="/css/visual-effects.css">
+    <link rel="stylesheet" href="/css/style.css">`n    <link rel="stylesheet" href="/css/glassmorphism.css">`n    <link rel="stylesheet" href="/css/themes.css">`n    <link rel="stylesheet" href="/css/mobile.css">`n    <link rel="stylesheet" href="/css/charts.css">`n    <link rel="stylesheet" href="/css/charts-3d.css">`n    <link rel="stylesheet" href="/css/visual-effects.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
     <%- include('partials/navbar', { user: user, active: 'dashboard' }) %>
@@ -47,6 +49,25 @@
                 <div class="stat-info">
                     <h3 id="verified-users"><%= stats.verifiedUsers %></h3>
                     <p>Verified Users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Charts Section -->
+        <div class="charts-section">
+            <h2>🎯 3D Data Visualization</h2>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>📊 3D Stats Cube</h3>
+                    <div id="stats-3d-chart" class="chart-3d-container"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>🌀 Activity Sphere</h3>
+                    <div id="activity-3d-chart" class="chart-3d-container"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>🔥 Performance Waves</h3>
+                    <div id="performance-3d-chart" class="chart-3d-container"></div>
                 </div>
             </div>
         </div>
@@ -165,27 +186,61 @@
             }).join('');
         }
 
-        // Auto-refresh cada 5 segundos
-        setInterval(() => {
+        // 🚀 REAL-TIME DATA UPDATES (Sin refrescar página)
+        function updateDashboardData() {
+            // Actualizar estadísticas principales
             fetch('/api/stats')
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('total-tickets').textContent = data.totalTickets;
-                    document.getElementById('active-tickets').textContent = data.activeTickets;
-                    document.getElementById('total-vouches').textContent = data.totalVouches;
-                    document.getElementById('verified-users').textContent = data.verifiedUsers;
+                    // Animar el cambio de números si es diferente
+                    animateNumberUpdate('total-tickets', data.totalTickets);
+                    animateNumberUpdate('active-tickets', data.activeTickets);
+                    animateNumberUpdate('total-vouches', data.totalVouches);
+                    animateNumberUpdate('verified-users', data.verifiedUsers);
                 })
                 .catch(err => console.error('Error updating stats:', err));
-            
-            loadRecentTickets();
-            loadBotStatus();
-        }, 5000);
 
-        // Inicializar al cargar
+            // Actualizar tickets recientes (sin refrescar)
+            loadRecentTickets();
+            
+            // Actualizar gráficos en tiempo real si existen
+            if (window.dashboardCharts) {
+                window.dashboardCharts.updateRealtimeData();
+            }
+        }
+
+        // Función para animar cambios de números
+        function animateNumberUpdate(elementId, newValue) {
+            const element = document.getElementById(elementId);
+            const currentValue = parseInt(element.textContent) || 0;
+            
+            if (currentValue !== newValue) {
+                element.style.transform = 'scale(1.1)';
+                element.style.color = '#00D9A3';
+                element.textContent = newValue;
+                
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                    element.style.color = '';
+                }, 300);
+                
+                // Crear efecto de partículas si aumentó
+                if (newValue > currentValue && window.visualEffects) {
+                    const rect = element.getBoundingClientRect();
+                    window.visualEffects.createExplosion(
+                        rect.left + rect.width / 2, 
+                        rect.top + rect.height / 2
+                    );
+                }
+            }
+        }
+
+        // Actualizar cada 10 segundos (más suave)
+        setInterval(updateDashboardData, 10000);        // Inicializar al cargar
         window.onload = () => {
             loadRecentTickets();
             loadBotStatus();
         };
     </script>
-    <script src="/js/animations.js"></script>`n    <script src="/js/charts.js"></script>`n    <script src="/js/visual-effects.js"></script>`n</body>
+    <script src="/js/animations.js"></script>`n    <script src="/js/charts.js"></script>`n    <script src="/js/charts-3d.js"></script>`n    <script src="/js/visual-effects.js"></script>`n</body>
 </html>

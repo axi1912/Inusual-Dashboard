@@ -417,9 +417,10 @@ class DashboardCharts {
     }
 
     startRealtimeUpdates() {
+        // Actualizar cada 15 segundos (más suave)
         setInterval(() => {
             this.updateRealtimeData();
-        }, 5000);
+        }, 15000);
     }
 
     updateRealtimeData() {
