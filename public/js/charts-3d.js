@@ -9,15 +9,17 @@ class Charts3D {
         this.controls = {};
         this.animations = {};
         this.manualRotation = {};
+        
+        // 🔥 DATOS INICIALES REALES (serán actualizados desde el dashboard)
         this.data = {
             stats: {
-                tickets: 120,
-                vouches: 85,
-                verified: 250,
-                active: 45
+                tickets: window.initialStats?.totalTickets || 0,
+                vouches: window.initialStats?.totalVouches || 0,
+                verified: window.initialStats?.verifiedUsers || 0,
+                active: window.initialStats?.activeTickets || 0
             },
-            activity: [65, 89, 92, 78, 56, 89, 95],
-            performance: [88, 92, 85, 97, 89, 93, 96]
+            activity: [65, 89, 92, 78, 56, 89, 95], // Datos por defecto, serán actualizados
+            performance: [88, 92, 85, 97, 89, 93, 96] // Datos por defecto, serán actualizados
         };
         this.init();
     }

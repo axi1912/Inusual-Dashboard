@@ -343,16 +343,95 @@
             }
         }
 
-        // Auto-refresh cada 5 segundos
-        setInterval(() => {
+        // 🚀 SISTEMA INTELIGENTE DE ACTUALIZACIONES SIN REFRESH
+        let updateTimer = null;
+        let lastUpdate = Date.now();
+        
+        function smartTicketsUpdate() {
             fetch('/api/tickets')
                 .then(res => res.json())
                 .then(data => {
-                    allTickets = data;
-                    applyFilters(); // Re-aplicar filtros con datos nuevos
+                    const newCount = data.length;
+                    const oldCount = allTickets.length;
+                    
+                    // Solo actualizar si hay cambios reales
+                    if (newCount !== oldCount) {
+                        console.log(`🎫 Tickets actualizados: ${oldCount} → ${newCount}`);
+                        allTickets = data;
+                        applyFilters();
+                        
+                        // Notificación visual si hay nuevos tickets
+                        if (newCount > oldCount) {
+                            showTicketNotification(`🆕 ${newCount - oldCount} nuevo(s) ticket(s)!`);
+                        }
+                    }
+                    lastUpdate = Date.now();
                 })
-                .catch(err => console.error('Error updating tickets:', err));
-        }, 5000);
+                .catch(err => {
+                    console.error('Error updating tickets:', err);
+                    showTicketNotification('❌ Error actualizando tickets', 'error');
+                });
+        }
+        
+        function showTicketNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `ticket-notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#ff6b6b' : '#00D9A3'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        function startSmartUpdates() {
+            // Actualizar cada 30 segundos (más eficiente)
+            updateTimer = setInterval(smartTicketsUpdate, 30000);
+            console.log('✅ Sistema inteligente de tickets iniciado');
+        }
+        
+        function stopSmartUpdates() {
+            if (updateTimer) {
+                clearInterval(updateTimer);
+                updateTimer = null;
+            }
+        }
+        
+        // Pausar cuando la pestaña no está visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopSmartUpdates();
+            } else {
+                startSmartUpdates();
+                // Actualizar inmediatamente al volver a la pestaña
+                smartTicketsUpdate();
+            }
+        });
+        
+        // Auto-refresh desactivado para mejor experiencia de usuario
+        // Los datos se actualizan automáticamente al realizar acciones
+        // setInterval(() => {
+        //     fetch('/api/tickets')
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             allTickets = data;
+        //             applyFilters(); // Re-aplicar filtros con datos nuevos
+        //         })
+        //         .catch(err => console.error('Error updating tickets:', err));
+        // }, 5000);
 
         function applyFilters() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -649,6 +728,7 @@
         // Inicializar al cargar
         window.onload = () => {
             loadTickets(); // Cargar tickets desde API
+            startSmartUpdates(); // Iniciar actualizaciones inteligentes
         };
 
         // Exportar a CSV

@@ -133,16 +133,92 @@
         let allVouches = <%= JSON.stringify(vouches) %>;
         let filteredVouches = [...allVouches];
 
-        // Auto-refresh cada 5 segundos
-        setInterval(() => {
+        // 🚀 SISTEMA INTELIGENTE DE ACTUALIZACIONES SIN REFRESH
+        let updateTimer = null;
+        
+        function smartVouchesUpdate() {
             fetch('/api/vouches')
                 .then(res => res.json())
                 .then(data => {
-                    allVouches = data;
-                    applyFilters();
+                    const newCount = data.length;
+                    const oldCount = allVouches.length;
+                    
+                    // Solo actualizar si hay cambios reales
+                    if (newCount !== oldCount) {
+                        console.log(`⭐ Vouches actualizados: ${oldCount} → ${newCount}`);
+                        allVouches = data;
+                        applyFilters();
+                        
+                        // Notificación visual si hay nuevos vouches
+                        if (newCount > oldCount) {
+                            showVouchNotification(`🌟 ${newCount - oldCount} nuevo(s) vouch(es)!`);
+                        }
+                    }
                 })
-                .catch(err => console.error('Error updating vouches:', err));
-        }, 5000);
+                .catch(err => {
+                    console.error('Error updating vouches:', err);
+                    showVouchNotification('❌ Error actualizando vouches', 'error');
+                });
+        }
+        
+        function showVouchNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `vouch-notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#ff6b6b' : '#f093fb'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        function startSmartVouchUpdates() {
+            // Actualizar cada 25 segundos
+            updateTimer = setInterval(smartVouchesUpdate, 25000);
+            console.log('✅ Sistema inteligente de vouches iniciado');
+        }
+        
+        function stopSmartVouchUpdates() {
+            if (updateTimer) {
+                clearInterval(updateTimer);
+                updateTimer = null;
+            }
+        }
+        
+        // Pausar cuando la pestaña no está visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopSmartVouchUpdates();
+            } else {
+                startSmartVouchUpdates();
+                smartVouchesUpdate();
+            }
+        });
+        
+        // Auto-refresh desactivado para mejor experiencia de usuario
+        // Los datos se actualizan automáticamente al realizar acciones
+        // setInterval(() => {
+        //     fetch('/api/vouches')
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             allVouches = data;
+        //             applyFilters();
+        //         })
+        //         .catch(err => console.error('Error updating vouches:', err));
+        // }, 5000);
 
         function applyFilters() {
             const searchTerm = document.getElementById('searchVouch').value.toLowerCase();
@@ -230,6 +306,7 @@
         // Inicializar
         window.onload = () => {
             updateVouchCount();
+            startSmartVouchUpdates(); // Iniciar actualizaciones inteligentes
         };
 
         // Exportar a CSV

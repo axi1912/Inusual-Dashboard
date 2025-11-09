@@ -549,11 +549,97 @@
             alert(message); // Podrías mejorar esto con una notificación bonita
         }
 
-        // Auto-refresh cada 5 segundos
-        setInterval(loadBotsStatus, 5000);
+        // 🚀 SISTEMA INTELIGENTE DE BOTS SIN REFRESH
+        let botUpdateTimer = null;
+        let lastBotStatus = {};
+        
+        function smartBotsUpdate() {
+            loadBotsStatus().then(() => {
+                // Comparar estados para detectar cambios
+                const currentStatus = {};
+                document.querySelectorAll('.bot-card').forEach(card => {
+                    const botId = card.dataset.botId;
+                    const statusElement = card.querySelector('.bot-status');
+                    if (statusElement) {
+                        currentStatus[botId] = statusElement.textContent.trim();
+                    }
+                });
+                
+                // Notificar solo cambios significativos
+                Object.keys(currentStatus).forEach(botId => {
+                    const oldStatus = lastBotStatus[botId];
+                    const newStatus = currentStatus[botId];
+                    
+                    if (oldStatus && oldStatus !== newStatus) {
+                        const botName = bots.find(b => b.id === botId)?.name || botId;
+                        showBotNotification(`🤖 ${botName}: ${oldStatus} → ${newStatus}`);
+                    }
+                });
+                
+                lastBotStatus = { ...currentStatus };
+                console.log('🤖 Estados de bots actualizados');
+            });
+        }
+        
+        function showBotNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #667eea;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 300px;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+        
+        function startSmartBotUpdates() {
+            // Actualizar cada 20 segundos (estado de bots cambia frecuentemente)
+            botUpdateTimer = setInterval(smartBotsUpdate, 20000);
+            console.log('✅ Sistema inteligente de bots iniciado');
+        }
+        
+        function stopSmartBotUpdates() {
+            if (botUpdateTimer) {
+                clearInterval(botUpdateTimer);
+                botUpdateTimer = null;
+            }
+        }
+        
+        // Pausar cuando la pestaña no está visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopSmartBotUpdates();
+            } else {
+                startSmartBotUpdates();
+                smartBotsUpdate();
+            }
+        });
+        
+        // Auto-refresh desactivado para mejor experiencia de usuario
+        // El estado de los bots se actualiza automáticamente al realizar acciones
+        // setInterval(loadBotsStatus, 5000);
 
         // Cargar al inicio
-        loadBotsStatus();
+        loadBotsStatus().then(() => {
+            // Inicializar sistema inteligente después de la carga inicial
+            setTimeout(() => {
+                startSmartBotUpdates();
+                console.log('🤖 Bots dashboard inicializado con actualizaciones inteligentes');
+            }, 1000);
+        });
     </script>
 </body>
 </html>
