@@ -1,0 +1,221 @@
+/*  ENHANCED THEME SYSTEM */
+/* Light & Dark Mode with Advanced Glassmorphism */
+
+/* Light Theme Variables */
+[data-theme="light"] {
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --text-primary: #2c3e50;
+    --text-secondary: #6c757d;
+    --border-color: #e9ecef;
+    
+    /* Light Mode Glass Effects */
+    --glass-bg-light: rgba(255, 255, 255, 0.25);
+    --glass-border-light: rgba(255, 255, 255, 0.3);
+    --glass-shadow-light: rgba(0, 0, 0, 0.1);
+    
+    /* Light Mode Gradients */
+    --gradient-bg-light: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 70%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 70%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 70%),
+        linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Dark Theme Variables (Enhanced) */
+[data-theme="dark"] {
+    --bg-primary: #0d0d0d;
+    --bg-secondary: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --border-color: #333333;
+    
+    /* Dark Mode Glass Effects */
+    --glass-bg-dark: rgba(255, 255, 255, 0.05);
+    --glass-border-dark: rgba(255, 255, 255, 0.1);
+    --glass-shadow-dark: rgba(0, 0, 0, 0.3);
+    
+    /* Dark Mode Gradients */
+    --gradient-bg-dark: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+}
+
+/* Dynamic Body Background */
+body[data-theme="light"] {
+    background: var(--gradient-bg-light);
+    color: var(--text-primary);
+}
+
+body[data-theme="dark"] {
+    background: var(--gradient-bg-dark);
+    color: var(--text-primary);
+}
+
+/* Light Mode Glassmorphism Cards */
+[data-theme="light"] .stat-card {
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="light"] .stat-card:hover {
+    background: rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Light Mode Navbar */
+[data-theme="light"] .navbar {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 217, 163, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Light Mode Tables */
+[data-theme="light"] .table-container {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .table tbody tr:hover {
+    background: rgba(0, 217, 163, 0.1);
+}
+
+/* Light Mode Navigation Links */
+[data-theme="light"] .nav-links a {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .nav-links a:hover,
+[data-theme="light"] .nav-links a.active {
+    background: var(--gradient-mint);
+    color: white;
+    box-shadow: 0 10px 25px rgba(0, 217, 163, 0.2);
+}
+
+/* Enhanced Theme Toggle Button */
+#theme-toggle {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1.2rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+#theme-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+#theme-toggle:hover::before {
+    left: 100%;
+}
+
+#theme-toggle:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 217, 163, 0.3);
+}
+
+[data-theme="light"] #theme-toggle {
+    background: rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Light Mode Login Card */
+[data-theme="light"] .login-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth Theme Transition */
+* {
+    transition: 
+        background-color 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+        color 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+        border-color 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+        box-shadow 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Theme Toggle Animation */
+.theme-transition {
+    transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Light Mode Text Colors */
+[data-theme="light"] .page-header h1 {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme="light"] .stat-card h3 {
+    background: linear-gradient(135deg, #2c3e50 0%, #00D9A3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Light Mode Particles */
+[data-theme="light"] .background-particles div {
+    background: radial-gradient(circle, rgba(0, 217, 163, 0.3), rgba(0, 217, 163, 0.05)) !important;
+}
+
+/* Advanced Animation for Theme Switch */
+@keyframes themeSwitch {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.theme-switching {
+    animation: themeSwitch 0.6s ease-in-out;
+}
+
+/* Mobile Light Mode Optimizations */
+@media (max-width: 768px) {
+    [data-theme="light"] .stat-card {
+        background: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+    
+    [data-theme="light"] .navbar {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+}

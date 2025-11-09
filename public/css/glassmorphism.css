@@ -1,0 +1,293 @@
+/*  GLASSMORPHISM VISUAL UPGRADES */
+/* Modern Glass Effects with Blur, Gradients & Animations */
+
+/* Enhanced Root Variables for Glassmorphism */
+:root {
+    /* Glass Effect Colors */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: rgba(0, 0, 0, 0.2);
+    
+    /* Gradient Colors */
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --gradient-mint: linear-gradient(135deg, #00D9A3 0%, #00b894 100%);
+    
+    /* Animation Variables */
+    --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Enhanced Body with Animated Background */
+body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+    background-attachment: fixed;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Floating Animation Particles */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 25% 75%, rgba(0, 217, 163, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 25%, rgba(88, 101, 242, 0.1) 0%, transparent 50%);
+    animation: floatingParticles 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes floatingParticles {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+/* Glassmorphism Login Card */
+.login-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    transition: all 0.4s var(--smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Glassmorphism Navbar */
+.navbar {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: none;
+    border-bottom: 1px solid rgba(0, 217, 163, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Enhanced Stats Cards with Glass Effect */
+.stat-card {
+    background: rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.4s var(--smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-mint);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+/* Animated Counter Numbers */
+.stat-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: var(--gradient-mint);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+/* Glass Tables */
+.table-container {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.table th {
+    background: rgba(0, 217, 163, 0.1);
+    border: none;
+    padding: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.table td {
+    background: transparent;
+    border: none;
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.01);
+}
+
+/* Enhanced Buttons with Glass Effect */
+.btn-primary {
+    background: var(--gradient-mint);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s var(--bounce);
+    box-shadow: 
+        0 8px 20px rgba(0, 217, 163, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 15px 30px rgba(0, 217, 163, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass Navigation Links */
+.nav-links a {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    transition: all 0.3s var(--smooth);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--gradient-mint);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 217, 163, 0.3);
+}
+
+/* Enhanced Discord Button */
+.discord-button {
+    background: linear-gradient(135deg, #5865F2 0%, #7289DA 100%);
+    box-shadow: 
+        0 15px 30px rgba(88, 101, 242, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    transition: all 0.3s var(--bounce);
+}
+
+.discord-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 
+        0 20px 40px rgba(88, 101, 242, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Loading Animation for Stats */
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+
+.stat-loading {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Pulse Animation for Active Elements */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Mobile Glassmorphism Optimizations */
+@media (max-width: 768px) {
+    .stat-card {
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+    
+    .navbar {
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+    
+    .login-card {
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+}
+
+/* Advanced Hover Animations */
+.glass-hover {
+    transition: all 0.4s var(--smooth);
+}
+
+.glass-hover:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
