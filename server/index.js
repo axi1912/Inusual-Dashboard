@@ -109,7 +109,7 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
 });
 
 // Página de tickets
-app.get('/tickets', isAuthenticated, (req, res) => {
+app.get('/tickets', isAuthenticated, async (req, res) => {
     const allTickets = await db.getAllTickets();
     
     // Formatear para la vista
@@ -129,7 +129,7 @@ app.get('/tickets', isAuthenticated, (req, res) => {
 });
 
 // API endpoint para tickets en tiempo real
-app.get('/api/tickets', isAuthenticated, (req, res) => {
+app.get('/api/tickets', isAuthenticated, async (req, res) => {
     const allTickets = await db.getAllTickets();
     
     const tickets = allTickets.map(ticket => ({
@@ -457,6 +457,7 @@ app.listen(PORT, () => {
     console.log(`🌐 Dashboard running on http://localhost:${PORT}`);
     console.log(`✅ Ready to manage Inusual Bots`);
 });
+
 
 
 
